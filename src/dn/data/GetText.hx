@@ -211,13 +211,17 @@ class GetText {
 		// Strip notes from msgid (but keep Disambiguation Context)
 		msgId = TRANSLATOR_NOTE_REG.replace(msgId,"$3");
 		msgId = COMMENT_REG.replace(msgId,"$3");
-
 		var str = dict.exists(msgId) && dict.get(msgId)!="" ? dict.get(msgId) : msgId;
 
 		// In-text variables
 		if( vars!=null )
-			for(k in Reflect.fields(vars))
-				str = StringTools.replace(str, '::$k::', Std.string( Reflect.field(vars,k) ));
+			for(k in Reflect.fields(vars)) {
+				var val : Dynamic = Reflect.field(vars, k);
+				str = StringTools.replace(str, '::$k::', Std.string( val ));
+				if(Std.isOfType(val, Float)) {
+					str = StringTools.replace(str, '::$k%::', Std.string( val * 100 ) + "%");
+				}
+			}
 
 		// Strip notes from output
 		str = TRANSLATOR_NOTE_REG.replace(str,"$3");
